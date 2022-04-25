@@ -87,7 +87,7 @@ export default {
   data() {
     return {
       currentUser: {},
-      isAuthenticate: true,
+      isAuthenticated: true,
       profile: {},
       isFollowed: false,
     };
@@ -97,9 +97,9 @@ export default {
   },
   methods: {
     fetchProfile() {
-      const { currentUser, isAuthenticate } = dummyUser;
+      const { currentUser, isAuthenticated } = dummyUser;
       this.currentUser = currentUser;
-      this.isAuthenticate = isAuthenticate;
+      this.isAuthenticated = isAuthenticated;
 
       this.profile = {
         ...this.initialProfile,

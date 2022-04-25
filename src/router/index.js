@@ -46,6 +46,16 @@ const routes = [
     component: () => import('../views/User.vue')
   },
   {
+    path: '/admin',
+    exact: true,
+    redirect: '/admin/restaurant'
+  },
+  {
+    path: '/admin/restaurant',
+    name: 'ADMIN-RESTAURANT',
+    component: () => import('../views/AdminRestaurants.vue')
+  },
+  {
     path: '*',
     name: 'notFound',
     component: NOTFound
