@@ -4,7 +4,11 @@
     <div class="card-body" v-for="comment in NewestComments" :key="comment.id">
       <div>
         <h4>
-          <a href="#"> {{ comment.Restaurant.name }} </a>
+          <router-link
+            :to="{ name: 'RESTAURANT', params: { id: comment.Restaurant.id } }"
+          >
+            {{ comment.Restaurant.name }}
+          </router-link>
         </h4>
         <p>{{ comment.text }}</p>
         by
@@ -16,18 +20,9 @@
   </div>
 </template>
 <script>
-
-import moment from "moment";
+import { fromNowFilter } from "../utils/mixins";
 export default {
-  filters:{
-    fromNow(value){
-      if(!value){
-      return "-"
-    }
-    // 使用 moment 提供的 fromNow 方法
-    return moment(value).fromNow();
-    },
-  },
+  mixins: [fromNowFilter],
   props: {
     NewestComments: {
       type: Array,

@@ -18,7 +18,9 @@
       <div class="ml-auto d-flex align-items-center">
         <template v-if="isAuthenticated">
           <!-- is user is admin -->
-          <router-link to="#" class="text-white mr-3"> 管理員後台 </router-link>
+          <router-link to="/admin/restaurants" class="text-white mr-3">
+            管理員後台
+          </router-link>
 
           <!-- is user is login -->
           <router-link to="#" class="text-white mr-3">

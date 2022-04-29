@@ -29,7 +29,15 @@
               (追隨者)
             </li>
           </ul>
-          <p></p>
+
+          <p>
+            <router-link
+              :to="{ name: 'USER-EDIT', params: { id: currentUser.id } }"
+              ><button type="button" class="btn btn-primary">
+                edit
+              </button></router-link
+            >
+          </p>
           <!-- vue無法讀取isAuthenticated, 無法做v-if判斷  
            -->
           <form
@@ -54,7 +62,6 @@
               追蹤
             </button>
           </form>
-          <p></p>
         </div>
       </div>
     </div>
@@ -62,16 +69,16 @@
 </template>
 <script>
 /* eslint-disable */
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root1122@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+// const dummyUser = {
+//   currentUser: {
+//     id: 1,
+//     name: "管理者",
+//     email: "root1122@example.com",
+//     image: "https://i.pravatar.cc/300",
+//     isAdmin: true,
+//   },
+//   isAuthenticated: true,
+// };
 
 export default {
   props: {

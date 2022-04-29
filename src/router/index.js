@@ -36,11 +36,30 @@ const routes = [
     path: '/restaurants/top',
     name: 'RESTAURANTS-TOP',
     component: () => import('../views/RestaurantsTop.vue')
-  }, {
+  },
+
+  {
+    path: '/restaurants/:id',
+    name: 'RESTAURANT',
+    component: () => import('../views/Restaurant.vue')
+  },
+
+  {
+    path: '/restaurants/:id/dashboard',
+    name: 'DASHBOARD',
+    component: () => import('../views/RestaurantDashboard.vue')
+  },
+  {
     path: '/users/top',
     name: 'USERS-TOP',
     component: () => import('../views/UsersTop.vue')
-  }, {
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'USER-EDIT',
+    component: () => import('../views/UserEdit.vue')
+  },
+  {
     path: '/users/:id',
     name: 'USER',
     component: () => import('../views/User.vue')
@@ -51,9 +70,34 @@ const routes = [
     redirect: '/admin/restaurant'
   },
   {
-    path: '/admin/restaurant',
-    name: 'ADMIN-RESTAURANT',
+    path: '/admin/restaurants',
+    name: 'ADMIN-RESTAURANTS',
     component: () => import('../views/AdminRestaurants.vue')
+  },
+  {
+    path: '/admin/restaurants/new',
+    name: 'ADMIN-RESTAURANTS-NEW',
+    component: () => import('../views/AdminRestaurantNew.vue')
+  },
+  {
+    path: '/admin/categories',
+    name: 'ADMIN-CATEGORIES',
+    component: () => import('../views/AdminCategories.vue')
+  },
+  {
+    path: '/admin/users',
+    name: 'ADMIN-USERS',
+    component: () => import('../views/AdminUsers.vue')
+  },
+  {
+    path: '/admin/restaurants/:id/edit',
+    name: 'ADMIN-RESTAURANT-EDIT',
+    component: () => import('../views/AdminRestaurantEdit.vue')
+  },
+  {
+    path: '/admin/restaurants/:id',
+    name: 'ADMIN-RESTAURANT',
+    component: () => import('../views/AdminRestaurant.vue')
   },
   {
     path: '*',
