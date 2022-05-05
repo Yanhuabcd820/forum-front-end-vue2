@@ -8,7 +8,7 @@
       <div class="form-label-group mb-2">
         <label for="email">email</label>
         <input
-          v-model="Email"
+          v-model="email"
           id="email"
           name="email"
           type="email"
@@ -21,9 +21,9 @@
       </div>
 
       <div class="form-label-group mb-3">
-        <label for="password">Password</label>
+        <label for="password">password</label>
         <input
-          v-model="Password"
+          v-model="password"
           id="password"
           name="password"
           type="password"
@@ -50,21 +50,34 @@
 </template>
 
 <script>
+/* eslint-disable */
+import authorizationAPI from "./../apis/authorization";
 export default {
   data() {
     return {
-      Email: "",
-      Password: "",
+      email: "",
+      password: "",
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        email: this.Email,
-        password: this.Password,
-      });
+    // handleSubmit() {
+    //   const data = JSON.stringify({
+    //     email: this.email,
+    //     password: this.password,
+    //   });
 
-      console.log(data);
+    //   console.log(data);
+    // },
+    handleSubmit(e) {
+      authorizationAPI
+        .signIn({
+          email: this.email,
+          password: this.password,
+        })
+        .then((response) => {
+          // TODO: 取得 API 請求後的資料
+          console.log("res", response);
+        });
     },
   },
 };

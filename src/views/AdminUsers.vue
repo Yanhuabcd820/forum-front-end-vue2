@@ -91,16 +91,18 @@ export default {
       const { users } = dummyUsers;
       this.users = users;
     },
+    // toggleIsAdmin(userId) {
+    //   const user = this.users.find((user) => user.id === userId);
+    //   user.isAdmin = !user.isAdmin;
+    // },
     toggleIsAdmin(userId) {
-      this.users = this.users.filter((user) => {
+      this.users = this.users.map((user) => {
         if (user.id === userId) {
-          console.log(user.id, user.isAdmin);
           return {
             ...user,
             isAdmin: !user.isAdmin,
           };
         }
-
         return user;
       });
     },

@@ -326,7 +326,6 @@ export default {
   },
   methods: {
     fetchRestaurants() {
-      
       const {
         restaurants,
         categories,
