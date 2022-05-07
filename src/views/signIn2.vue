@@ -66,40 +66,41 @@ export default {
     };
   },
   methods: {
-    async handleSubmit(e) {
-      try {
-        if (!this.email || !this.password) {
-          Toast.fire({
-            icon: "warning",
-            title: "請填入 email 和 password",
-          });
-          return;
-        }
-        this.isProcessing = true;
-
-        const response = await authorizationAPI.signIn({
-          email: this.email,
-          password: this.password,
-        });
-
-        // 取得 API 請求後的資料
-        const { data } = response;
-
-        // 將 token 存放在 localStorage 內
-        localStorage.setItem("token", data.token);
-        // 成功登入後轉址到餐廳首頁
-        this.$router.push("/restaurants");
-      } catch (error) {
-        // 將密碼欄位清空
-        this.password = "";
-        // 顯示錯誤提示
+    handleSubmit(e) {
+      if (!this.email || !this.password) {
         Toast.fire({
           icon: "warning",
-          title: "請確認您輸入了正確的帳號密碼",
+          title: "請填入 email 和 password",
         });
-        console.log("error", error);
-        this.isProcessing = false;
+        return;
       }
+      this.isProcessing = true;
+
+      authorizationAPI
+        .signIn({
+          email: this.email,
+          password: this.password,
+        })
+        .then((response) => {
+          // 取得 API 請求後的資料
+          const { data } = response;
+
+          // 將 token 存放在 localStorage 內
+          localStorage.setItem("token", data.token);
+          // 成功登入後轉址到餐廳首頁
+          this.$router.push("/restaurants");
+        })
+        .catch((error) => {
+          // 將密碼欄位清空
+          this.password = "";
+          // 顯示錯誤提示
+          Toast.fire({
+            icon: "warning",
+            title: "請確認您輸入了正確的帳號密碼",
+          });
+          console.log("error", error);
+          this.isProcessing = false;
+        });
     },
   },
 };
