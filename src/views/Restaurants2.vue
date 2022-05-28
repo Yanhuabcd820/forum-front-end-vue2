@@ -14,12 +14,12 @@
 
     <!-- 分頁標籤 RestaurantPagination -->
     <RestaurantsPagination
-      v-if="totalPage.length"
-      :categoryId="categoryId"
-      :currentPage="currentPage"
-      :totalPage="totalPage"
-      :prev="previousPage"
-      :next="nextPage"
+      v-if="totalPage.length > 1"
+      :current-page="currentPage"
+      :total-page="totalPage"
+      :category-id="categoryId"
+      :previous-page="previousPage"
+      :next-page="nextPage"
     />
   </div>
 </template>
@@ -30,7 +30,7 @@ import RestaurantCard from "../components/RestaurantCard";
 import RestaurantsNavPills from "../components/RestaurantsNavPills";
 import RestaurantsPagination from "../components/RestaurantsPagination";
 import restaurantsAPI from "./../apis/restaurants";
-import { Toast } from "./../utils/helpers";
+// import { Toast } from "./../utils/helpers";
 
 export default {
   name: "restaurants",
@@ -52,25 +52,19 @@ export default {
     };
   },
   created() {
-    const { page = "", categoryId = "" } = this.$route.query;
-    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId });
-  },
-  beforeRouteUpdate(to, from, next) {
-    // console.log("to", to);
-    // console.log("from", from);
-    const { page = "", categoryId = "" } = to.query;
-    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId });
-    next();
+    this.fetchRestaurants({
+      page: 1,
+      categoryId: "",
+    });
   },
   methods: {
-    async fetchRestaurants({ queryPage, queryCategoryId }) {
+    async fetchRestaurants({ page, categoryId }) {
       try {
         const response = await restaurantsAPI.getRestaurants({
-          page: queryPage,
-          categoryId: queryCategoryId,
+          page,
+          categoryId,
         });
-
-        console.log("response", response);
+        console.log(response);
         const {
           restaurants,
           categories,
@@ -80,6 +74,7 @@ export default {
           prev,
           next,
         } = response.data;
+
         this.restaurants = restaurants;
         this.categories = categories;
         this.categoryId = categoryId;
@@ -89,10 +84,6 @@ export default {
         this.nextPage = next;
       } catch (error) {
         console.log("error", error);
-        Toast.fire({
-          icon: "error",
-          title: "無法取得餐廳資料，請稍後再試",
-        });
       }
     },
   },

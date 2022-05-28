@@ -77,6 +77,8 @@
   </div>
 </template>
 <script>
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
 export default {
   data() {
     return {
@@ -87,14 +89,21 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.Name,
-        email: this.Email,
-        password: this.Password,
-        passwordCheck: this.PasswordCheck,
-      });
-      console.log(data);
+    async handleSubmit() {
+      try {
+        await authorizationAPI.signup({
+          name: this.Name,
+          email: this.Email,
+          password: this.Password,
+          passwordCheck: this.PasswordCheck,
+        });
+        this.$router.push("/signin");
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法sign up，請稍後再試",
+        });
+      }
     },
   },
 };

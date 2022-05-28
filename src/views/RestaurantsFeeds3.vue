@@ -25,6 +25,7 @@ import NewestComments from "../components/NewestComments";
 import feedsAPI from "./../apis/restaurants";
 import { Toast } from "./../utils/helpers";
 /* eslint-disable */
+
 export default {
   name: "restaurant-feeds",
   components: {
@@ -44,13 +45,11 @@ export default {
   methods: {
     async featchFeeds() {
       try {
-        const res = await feedsAPI.getFeeds();
-        console.log("res", res);
-        const { restaurants, comments } = res.data;
-        this.restaurants = restaurants;
-        this.comments = comments.filter(
-          (item) => item.Restaurant.name && item.text
-        );
+        const response = await feedsAPI.getFeeds({
+          restaurants,
+          comments,
+        });
+        console.log("response", response);
       } catch (error) {
         console.log("error", error);
         Toast.fire({
@@ -58,6 +57,10 @@ export default {
           title: "無法取得資料，請稍後再試",
         });
       }
+      // this.restaurants = dummyData.restaurants;
+      // this.comments = dummyData.comments.filter(
+      //   (item) => item.Restaurant.name && item.text
+      // );
     },
   },
 };

@@ -99,9 +99,7 @@
       />
     </div>
 
-    <button type="submit" class="btn btn-primary" :disabled="isProcessing">
-      {{ isProcessing ? "處裡中..." : "送出" }}
-    </button>
+    <button type="submit" class="btn btn-primary">送出</button>
   </form>
 </template>
 <script>
@@ -123,10 +121,6 @@ export default {
         openingHours: "",
       }),
     },
-    isProcessing: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -145,7 +139,7 @@ export default {
   },
   created() {
     this.AdminRestaurantForm();
-    // console.log(this.initialRestaurant);
+    console.log(this.initialRestaurant);
     this.restaurant = {
       ...this.restaurant,
       ...this.initialRestaurant,
@@ -179,14 +173,6 @@ export default {
       const form = e.target;
       const formData = new FormData(form);
       this.$emit("after-submit", formData);
-    },
-  },
-  watch: {
-    initialRestaurant(newValue) {
-      this.restaurant = {
-        ...this.restaurant,
-        ...newValue,
-      };
     },
   },
 };

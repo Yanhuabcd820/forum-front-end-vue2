@@ -18,13 +18,13 @@
         </a>
         <h2>{{ user.name }}</h2>
         <span class="badge badge-secondary"
-          >追蹤人數：{{ user.Followers.length }}</span
+          >追蹤人數：{{ user.followerCount }}</span
         >
         <p class="mt-3">
           <button
             type="button"
             class="btn btn-danger"
-            @click="cancleFollow(user)"
+            @click="cancleFollow(user.id)"
             v-if="user.isFollowed"
           >
             取消追蹤
@@ -32,7 +32,7 @@
           <button
             type="button"
             class="btn btn-primary"
-            @click="addFollow(user)"
+            @click="addFollow(user.id)"
             v-else
           >
             追蹤
@@ -45,49 +45,8 @@
 <script>
 /* eslint-disable */
 import navTabs from "../components/NavTabs";
-const dummyData = {
-  users: [
-    {
-      id: 1,
-      name: "root",
-      email: "root@example.com",
-      password: "$2a$10$JoEFYiTgU1fEdO8D4txOqOgjTnI.V5JHpQUUTzzuA5YtIUgPbCuCq",
-      isAdmin: true,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-      Followers: ["betty", "mike"],
-      FollowerCount: 0,
-      isFollowed: true,
-    },
-    {
-      id: 2,
-      name: "user1",
-      email: "user1@example.com",
-      password: "$2a$10$J8oi5C/yCUquP0ByJiBKOOmAxlOS5M5tpN9RyDYLLsc5SiwIttGsu",
-      isAdmin: false,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-      Followers: [],
-      FollowerCount: 0,
-      isFollowed: false,
-    },
-    {
-      id: 3,
-      name: "user2",
-      email: "user2@example.com",
-      password: "$2a$10$CZLIR6hMy/9u8rcNJ17Iie59XuSmzUn9f7cLiezX6oPDWkbOdtXw2",
-      isAdmin: false,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-      Followers: [],
-      FollowerCount: 0,
-      isFollowed: false,
-    },
-  ],
-};
+import usersAPI from "./../apis/user";
+import { Toast } from "./../utils/helpers";
 export default {
   name: "userTop",
   components: {
@@ -99,40 +58,78 @@ export default {
     };
   },
   created() {
-    this.fetchUsers();
+    this.fetchTopUsers();
   },
   methods: {
-    fetchUsers() {
-      const { users } = dummyData;
-      this.users = users;
+    async fetchTopUsers() {
+      try {
+        const { data } = await usersAPI.getTopUsers();
+
+        // console.log("data", data);
+        // this.users = users;
+        this.users = data.users.map((user) => ({
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          followerCount: user.FollowerCount,
+          isFollowed: user.isFollowed,
+        }));
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法取得美食達人，請稍後再試",
+        });
+      }
     },
-    cancleFollow(user) {
-      this.users = this.users.map((_user) => {
-        if (_user.id === user.id) {
-          return {
-            ..._user,
-            isFollowed: false,
-          };
-        } else {
-          return {
-            ..._user,
-          };
-        }
-      });
+    async cancleFollow(userId) {
+      try {
+        const { data } = await usersAPI.deleteFollowing({ userId });
+
+        this.users = this.users.map((_user) => {
+          if (_user.id === userId) {
+            return {
+              ..._user,
+              followerCount: _user.followerCount - 1,
+              isFollowed: false,
+            };
+          } else {
+            return {
+              ..._user,
+            };
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法取得美食達人，請稍後再試",
+        });
+      }
     },
-    addFollow(user) {
-      this.users = this.users.map((_user) => {
-        if (_user.id === user.id) {
-          return {
-            ..._user,
-            isFollowed: true,
-          };
-        } else {
-          return {
-            ..._user,
-          };
-        }
-      });
+    async addFollow(Id) {
+      try {
+        const { data } = await usersAPI.addFollowing({ userId: Id });
+        // console.log("data33", data);
+        this.users = this.users.map((_user) => {
+          if (_user.id === userId) {
+            return {
+              ..._user,
+              followerCount: _user.followerCount + 1,
+              isFollowed: true,
+            };
+          } else {
+            return {
+              ..._user,
+            };
+          }
+        });
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法加入追蹤，請稍後再試",
+        });
+      }
     },
   },
 };
