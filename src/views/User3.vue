@@ -8,16 +8,16 @@
         />
         <div class="row">
           <div class="col-md-4">
-            <UserFollowingsCard :initialFollowings="profile.Followings" />
+            <UserFollowingsCard :initialFollowings="Followings" />
             <br />
-            <UserFollowersCard :initialFollowers="profile.Followers" />
+            <UserFollowersCard :initialFollowers="Followers" />
           </div>
           <div class="col-md-8">
-            <UserCommentsCard :Comments="profile.Comments" />
+            <UserCommentsCard :initialComments="Comments" />
 
             <br />
             <UserFavoritedRestaurantsCard
-              :initialFavoritedRestaurants="profile.FavoritedRestaurants"
+              :initialFavoritedRestaurants="FavoritedRestaurants"
             />
           </div>
         </div>
@@ -34,7 +34,6 @@ import UserFollowersCard from "../components/UserFollowersCard";
 import UserCommentsCard from "../components/UserCommentsCard";
 import UserFavoritedRestaurantsCard from "../components/UserFavoritedRestaurantsCard";
 import userAPI from "./../apis/user";
-import { Toast } from "./../utils/helpers";
 
 export default {
   name: "User",
@@ -61,11 +60,6 @@ export default {
       isFollowed: false,
     };
   },
-  beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.fetchUser(id);
-    next();
-  },
   created() {
     const { id } = this.$route.params;
     this.fetchUser(id);
@@ -79,6 +73,7 @@ export default {
         this.profile = profile;
         this.isFollowed = isFollowed;
 
+        console.log("profile", this.profile);
         const {
           id,
           name,
@@ -97,6 +92,14 @@ export default {
         this.FavoritedRestaurants = FavoritedRestaurants;
         this.Followings = Followings;
         this.Followers = Followers;
+        console.log("id", this.id);
+        console.log("name", this.name);
+        console.log("email", this.email);
+        console.log("image", this.image);
+        console.log("Comments", this.Comments);
+        console.log("FavoritedRestaurants", this.FavoritedRestaurants);
+        console.log("Followings", this.Followings);
+        console.log("Followers", this.Followers);
       } catch (error) {
         Toast.fire({
           icon: "error",

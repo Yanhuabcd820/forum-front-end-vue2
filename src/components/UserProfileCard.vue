@@ -10,8 +10,8 @@
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <h5 class="card-title">{{ currentUser.name }}</h5>
-          <p class="card-text">{{ currentUser.email }}</p>
+          <h5 class="card-title">{{ profile.name }}</h5>
+          <p class="card-text">{{ profile.email }}</p>
           <ul class="list-unstyled list-inline">
             <li>
               <strong>{{ profile.Comments.length }}</strong> 已評論餐廳
@@ -31,8 +31,7 @@
           </ul>
 
           <p>
-            <router-link
-              :to="{ name: 'USER-EDIT', params: { id: currentUser.id } }"
+            <router-link :to="{ name: 'USER-EDIT', params: { id: profile.id } }"
               ><button type="button" class="btn btn-primary">
                 edit
               </button></router-link
@@ -68,18 +67,7 @@
   </div>
 </template>
 <script>
-/* eslint-disable */
-// const dummyUser = {
-//   currentUser: {
-//     id: 1,
-//     name: "管理者",
-//     email: "root1122@example.com",
-//     image: "https://i.pravatar.cc/300",
-//     isAdmin: true,
-//   },
-//   isAuthenticated: true,
-// };
-
+import { mapState } from "vuex";
 export default {
   props: {
     initialProfile: {
@@ -93,26 +81,15 @@ export default {
   },
   data() {
     return {
-      currentUser: {},
-      isAuthenticated: true,
-      profile: {},
-      isFollowed: false,
+      profile: this.initialProfile,
+      isFollowed: this.initialIsFollowed,
     };
   },
-  created() {
-    this.fetchProfile();
+  computed: {
+    ...mapState(["currentUser", "isAuthenticated"]),
   },
-  methods: {
-    fetchProfile() {
-      const { currentUser, isAuthenticated } = dummyUser;
-      this.currentUser = currentUser;
-      this.isAuthenticated = isAuthenticated;
 
-      this.profile = {
-        ...this.initialProfile,
-      };
-      this.isFollowed = this.initialIsFollowed;
-    },
+  methods: {
     cancleFollow() {
       this.isFollowed = false;
     },
@@ -120,5 +97,13 @@ export default {
       this.isFollowed = true;
     },
   },
+  // watch: {
+  //   profile(newValue) {
+  //     this.profile = {
+  //       ...this.initialProfile,
+  //       ...newValue,
+  //     };
+  //   },
+  // },
 };
 </script>

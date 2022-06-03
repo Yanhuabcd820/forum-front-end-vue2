@@ -25,23 +25,34 @@
 export default {
   name: "UserCommentsCard",
   props: {
-    initialComments: {
+    Comments: {
       type: Array,
       required: true,
     },
   },
   data() {
-    return {
-      Comments: [],
-    };
+    return {};
   },
-  created() {
-    this.fetchComments();
-  },
-  methods: {
-    fetchComments() {
-      this.Comments = this.initialComments;
-    },
-  },
+  // watch: {
+  //   Comments(newValue) {
+  //     this.Comments = {
+  //       ...this.initialComments,
+  //       ...newValue,
+  //     };
+  //   },
+  // },
+  // created() {
+  //   this.fetchComments();
+  // },
+
+  // methods: {
+  //   fetchComments() {
+  //     this.Comments = {
+  //       ...this.initialComments,
+  //     };
+  //     // console.log("this.Comments", this.Comments);
+  //     // console.log("initialComments", this.initialComments);
+  //   },
+  // },
 };
 </script>

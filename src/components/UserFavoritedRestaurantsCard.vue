@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <strong>{{ initialFavoritedRestaurants.length }}</strong> 收藏的餐廳
+      <!-- <strong>{{ initialFavoritedRestaurants.length }}</strong> 收藏的餐廳 -->
     </div>
     <div class="card-body">
       <router-link

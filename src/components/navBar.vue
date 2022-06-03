@@ -39,43 +39,47 @@
 </template>
 <script>
 /*eslint-disable*/
+import { mapState } from "vuex";
 
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "YANHUA",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+// const dummyUser = {
+//   currentUser: {
+//     id: 1,
+//     name: "YANHUA",
+//     email: "root@example.com",
+//     image: "https://i.pravatar.cc/300",
+//     isAdmin: true,
+//   },
+//   isAuthenticated: true,
+// };
 
 export default {
   // Vue 會在沒有資料時使用此預設值
   data() {
     return {
-      currentUser: {
-        id: -1,
-        name: "",
-        email: "",
-        image: "",
-        isAdmin: false,
-      },
-      isAuthenticated: false,
+      // currentUser: {
+      //   id: -1,
+      //   name: "",
+      //   email: "",
+      //   image: "",
+      //   isAdmin: false,
+      // },
+      // isAuthenticated: false,
     };
   },
   created() {
-    this.fetchUser();
+    // this.fetchUser();
   },
   methods: {
-    fetchUser() {
-      this.currentUser = {
-        ...this.currentUser,
-        ...dummyUser.currentUser,
-      };
-      this.isAuthenticated = dummyUser.isAuthenticated;
-    },
+    // fetchUser() {
+    //   this.currentUser = {
+    //     ...this.currentUser,
+    //     ...dummyUser.currentUser,
+    //   };
+    //   this.isAuthenticated = dummyUser.isAuthenticated;
+    // },
+  },
+  computed: {
+    ...mapState(["currentUser", "isAuthenticated"]),
   },
 };
 </script>
