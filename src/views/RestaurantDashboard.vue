@@ -21,6 +21,8 @@
 </template>
 <script>
 /*eslint-disable*/
+import restaurantsAPI from "./../apis/restaurants";
+import { Toast } from "./../utils/helpers";
 const dummyDashboard = {
   restaurant: {
     id: 1,
@@ -118,19 +120,32 @@ export default {
     };
   },
   created() {
-    this.fetchDashboard();
+    const { id } = this.$route.params;
+    this.fetchDashboard(id);
   },
   methods: {
-    fetchDashboard() {
-      const { id, name, Category, Comments, viewCounts } =
-        dummyDashboard.restaurant;
-      this.restaurant = {
-        id,
-        name,
-        categoryName: Category ? Category.name : "未分類",
-        commentsLength: Comments.length,
-        viewCounts,
-      };
+    async fetchDashboard(restaurantId) {
+      try {
+        console.log(restaurantId);
+        const { data } = await restaurantsAPI.restaurants.getRestaurant({
+          restaurantId,
+        });
+        console.log(data);
+
+        const { id, name, Category, Comments, viewCounts } = data.restaurant;
+        this.restaurant = {
+          id,
+          name,
+          categoryName: Category ? Category.name : "未分類",
+          commentsLength: Comments.length,
+          viewCounts,
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法取得餐廳資料",
+        });
+      }
     },
   },
 };

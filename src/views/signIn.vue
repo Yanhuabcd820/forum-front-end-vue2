@@ -85,8 +85,10 @@ export default {
         // 取得 API 請求後的資料
         const { data } = response;
 
-        // 將 token 存放在 localStorage 內
-        localStorage.setItem("token", data.token);
+        // // 將 token 存放在 localStorage 內
+        // localStorage.setItem("token", data.token);
+        //將資料傳到vuex
+        this.$store.commit('setCurrentUser',data.token)
         // 成功登入後轉址到餐廳首頁
         this.$router.push("/restaurants");
       } catch (error) {

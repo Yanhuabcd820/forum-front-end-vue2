@@ -21,80 +21,10 @@
 import RestaurantDetail from "../components/RestaurantDetail";
 import RestaurantComments from "../components/RestaurantComments";
 import CreateComment from "../components/CreateComment";
-const dummyData = {
-  restaurant: {
-    id: 1,
-    name: "Judy Runte",
-    tel: "(918) 827-1962",
-    address: "98138 Elisa Road",
-    opening_hours: "08:00",
-    description: "dicta et cupiditate",
-    image: "https://loremflickr.com/320/240/food,dessert,restaurant/?random=1",
-    createdAt: "2019-06-22T09:00:43.000Z",
-    updatedAt: "2019-06-22T09:00:43.000Z",
-    CategoryId: 3,
-    Category: {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    FavoritedUsers: [],
-    LikedUsers: [],
-    Comments: [
-      {
-        id: 3,
-        text: "Quos asperiores in nostrum cupiditate excepturi aspernatur.",
-        UserId: 2,
-        RestaurantId: 1,
-        createdAt: "2019-06-22T09:00:43.000Z",
-        updatedAt: "2019-06-22T09:00:43.000Z",
-        User: {
-          id: 2,
-          name: "user1",
-          email: "user1@example.com",
-          password:
-            "$2a$10$0ISHJI48xu/VRNVmEeycFe8v5ChyT305f8KaJVIhumu7M/eKAikkm",
-          image: "https://i.imgur.com/XooCt5K.png",
-          isAdmin: false,
-          createdAt: "2019-06-22T09:00:43.000Z",
-          updatedAt: "2019-06-23T01:16:31.000Z",
-        },
-      },
-      {
-        id: 13,
-        text: "Q0123123123ur.",
-        UserId: 2,
-        RestaurantId: 1,
-        createdAt: "2019-06-22T09:00:43.000Z",
-        updatedAt: "2019-06-22T09:00:43.000Z",
-        User: {
-          id: 2,
-          name: "user1",
-          email: "user1@example.com",
-          password:
-            "$2a$10$0ISHJI48xu/VRNVmEeycFe8v5ChyT305f8KaJVIhumu7M/eKAikkm",
-          image: "https://i.imgur.com/XooCt5K.png",
-          isAdmin: false,
-          createdAt: "2019-06-22T09:00:43.000Z",
-          updatedAt: "2019-06-23T01:16:31.000Z",
-        },
-      },
-    ],
-  },
-  isFavorited: false,
-  isLiked: false,
-};
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+import restaurantsAPI from "./../apis/restaurants";
+import { Toast } from "./../utils/helpers";
+import { mapState } from "vuex";
+
 export default {
   name: "Restaurant",
   components: {
@@ -117,59 +47,96 @@ export default {
         isLiked: false,
       },
       restaurantComments: [],
-      currentUser: dummyUser.currentUser,
     };
+  },
+  beforeRouteUpdate(to, from, next) {
+    console.log("to", to);
+    console.log("from", from);
+    const { id } = to.params;
+    this.fetchRestaurant(id);
+    next();
   },
   created() {
     const { id } = this.$route.params;
     this.fetchRestaurant(id);
   },
+  computed: {
+    ...mapState(["currentUser"]),
+  },
   methods: {
-    fetchRestaurant(restaurantID) {
-      // console.log(restaurantID);
-      const { restaurant, isFavorited, isLiked } = dummyData;
-      const {
-        id,
-        name,
-        Category,
-        image,
-        opening_hours: openingHours,
-        tel,
-        address,
-        description,
-        Comments,
-      } = restaurant;
-      this.restaurant = {
-        id,
-        name,
-        categoryName: Category ? Category.name : "未分類",
-        image,
-        openingHours,
-        tel,
-        address,
-        description,
-        isFavorited,
-        isLiked,
-      };
-      this.restaurantComments = Comments;
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await restaurantsAPI.restaurants.getRestaurant({
+          restaurantId,
+        });
+        console.log(data);
+        const { restaurant, isFavorited, isLiked } = data;
+
+        const {
+          id,
+          name,
+          Category,
+          image,
+          opening_hours: openingHours,
+          tel,
+          address,
+          description,
+          Comments,
+        } = restaurant;
+        this.restaurant = {
+          id,
+          name,
+          categoryName: Category ? Category.name : "未分類",
+          image,
+          openingHours,
+          tel,
+          address,
+          description,
+          isFavorited,
+          isLiked,
+        };
+        this.restaurantComments = Comments;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法取得餐廳資料",
+        });
+      }
     },
-    afterDeleteComment(commentID) {
-      this.restaurantComments = this.restaurantComments.filter(
-        (comment) => comment.id !== commentID
-      );
+    async afterDeleteComment(id) {
+      try {
+        await restaurantsAPI.comments.deleteComment({ id });
+        this.restaurantComments = this.restaurantComments.filter(
+          (comment) => comment.id !== id
+        );
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除評論",
+        });
+      }
     },
-    afterCreateComment(payLoad) {
-      const { commentId, restaurantId, text } = payLoad;
-      this.restaurantComments.push({
-        id: commentId,
-        RestaurantId: restaurantId,
-        User: {
-          id: this.currentUser.id,
-          name: this.currentUser.name,
-        },
-        text,
-        createdAt: new Date(),
-      });
+    async afterCreateComment(payLoad) {
+      try {
+        const { commentId, restaurantId, text } = payLoad;
+
+        await restaurantsAPI.comments.postComments({ restaurantId, text });
+
+        this.restaurantComments.push({
+          RestaurantId: restaurantId,
+          User: {
+            id: this.currentUser.id,
+            name: this.currentUser.name,
+          },
+          text,
+          updatedAt: new Date(),
+        });
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法新增評論",
+        });
+      }
     },
   },
 };

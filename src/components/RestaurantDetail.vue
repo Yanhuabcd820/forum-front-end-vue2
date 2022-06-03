@@ -9,7 +9,7 @@
     <div class="col-lg-4">
       <img
         class="img-responsive center-block"
-        src="https://loremflickr.com/320/240/food,dessert,restaurant/"
+        :src="restaurant.image"
         style="width: 250px; margin-bottom: 25px"
       />
       <div class="contact-info-wrap">
@@ -41,7 +41,7 @@
       <button
         type="button"
         class="btn btn-danger btn-border mr-2"
-        @click.prevent.stop="cancleFavorited"
+        @click.prevent.stop="cancleFavorited(restaurant.id)"
         v-if="restaurant.isFavorited"
       >
         移除最愛
@@ -49,7 +49,7 @@
       <button
         type="button"
         class="btn btn-primary btn-border mr-2"
-        @click.prevent.stop="addFavorited"
+        @click.prevent.stop="addFavorited(restaurant.id)"
         v-else
       >
         加到最愛
@@ -57,7 +57,7 @@
       <button
         type="button"
         class="btn btn-danger like mr-2"
-        @click.prevent.stop="cancleLiked"
+        @click.prevent.stop="cancleLiked(restaurant.id)"
         v-if="restaurant.isLiked"
       >
         Unlike
@@ -65,7 +65,7 @@
       <button
         type="button"
         class="btn btn-primary like mr-2"
-        @click.prevent.stop="addLiked"
+        @click.prevent.stop="addLiked(restaurant.id)"
         v-else
       >
         Like
@@ -75,6 +75,8 @@
 </template>
 <script>
 /*eslint-disable*/
+import userAPI from "./../apis/user";
+import { Toast } from "./../utils/helpers";
 export default {
   name: "RestaurantDetail",
   props: {
@@ -91,22 +93,64 @@ export default {
   created() {
     this.featchRestaurantDetail();
   },
+  watch: {
+    initialRestaurantDetail(newValue) {
+      this.restaurant = {
+        ...this.initialRestaurantDetail,
+        ...newValue,
+      };
+    },
+  },
   methods: {
     featchRestaurantDetail() {
       this.restaurant = this.initialRestaurantDetail;
       const { opening_hours: openingHours } = this.initialRestaurantDetail;
     },
-    cancleFavorited() {
-      this.restaurant.isFavorited = false;
+    async cancleFavorited(restaurantId) {
+      try {
+        await userAPI.deleteFavorite({ restaurantId });
+
+        this.restaurant.isFavorited = false;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除最愛",
+        });
+      }
     },
-    addFavorited() {
-      this.restaurant.isFavorited = true;
+    async addFavorited(restaurantId) {
+      try {
+        await userAPI.addFavorite({ restaurantId });
+        this.restaurant.isFavorited = true;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除最愛",
+        });
+      }
     },
-    cancleLiked() {
-      this.restaurant.isLiked = false;
+    async cancleLiked(restaurantId) {
+      try {
+        await userAPI.deleteLike({ restaurantId });
+        this.restaurant.isLiked = false;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除最愛",
+        });
+      }
     },
-    addLiked() {
-      this.restaurant.isLiked = true;
+    async addLiked(restaurantId) {
+      try {
+        await userAPI.addLike({ restaurantId });
+
+        this.restaurant.isLiked = true;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除最愛",
+        });
+      }
     },
   },
 };

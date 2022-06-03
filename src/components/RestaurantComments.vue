@@ -13,7 +13,9 @@
           Delete
         </button>
         <h3>
-          <a href="#"> {{ Comment.User.name }} </a>
+          <router-link :to="{ name: 'USER', params: { id: Comment.User.id } }">
+            {{ Comment.User.name }}
+          </router-link>
         </h3>
         <p>{{ Comment.text }}</p>
         <footer class="blockquote-footer">
@@ -27,16 +29,8 @@
 <script>
 /*eslint-disable*/
 import { fromNowFilter } from "../utils/mixins";
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+import { mapState } from "vuex";
+
 export default {
   name: "restaurantComments",
   mixins: [fromNowFilter],
@@ -48,8 +42,11 @@ export default {
   },
   data() {
     return {
-      currentUser: dummyUser.currentUser,
+      // currentUser: this.currentUser,
     };
+  },
+  computed: {
+    ...mapState(["currentUser"]),
   },
   methods: {
     handleDeleteButtonClick(commentID) {
