@@ -1,11 +1,9 @@
 <template>
   <div class="container py-5">
-    <form
-      @submit.stop.prevent="currentUserSubmit"
-      @goto-UserEdit="gotoUserEdit"
-    >
+    <form @submit.stop.prevent="currentUserSubmit">
+      <!-- @goto-UserEdit="gotoUserEdit" -->
       <div class="form-group">
-        <label for="name">Name{{ currentUser.name }}</label>
+        <label for="name">Name</label>
         <input
           id="name"
           type="text"
@@ -13,7 +11,7 @@
           class="form-control"
           placeholder="Enter Name"
           required
-          v-model="currentUser.name"
+          v-model="user.name"
         />
       </div>
 
@@ -27,48 +25,48 @@
           class="form-control-file"
           @change="handleCurrentUserImg"
         />
-        <img :src="currentUser.image" alt="" width="100" />
+        <img :src="user.image" alt="" width="100" />
       </div>
 
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+
+      <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+        {{ isProcessing ? "處裡中..." : "Submit" }}
+      </button>
     </form>
   </div>
 </template>
 <script>
-const DummyUser = {
-  currentUser: {
-    id: 1,
-    name: "root",
-    email: "root@example.com",
-    image: null,
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-};
+import userAPI from "./../apis/user";
+import { emptyImageFilter } from "./../utils/mixins";
+import { mapState } from "vuex";
+import { Toast } from "./../utils/helpers";
+
 export default {
+  mixins: [emptyImageFilter],
   name: "UserEdit",
   data() {
     return {
-      currentUser: {},
+      user: {},
+      isCurrentUser: false,
+      isProcessing: false,
     };
   },
   created() {
-    this.fetchCurrentUser();
+    this.setUser();
+  },
+  computed: {
+    ...mapState(["currentUser"]),
   },
   methods: {
-    fetchCurrentUser() {
-      const { currentUser } = DummyUser;
-      const { name, image } = currentUser;
-      this.currentUser = {
-        name,
-        image:
-          image || "https://via.placeholder.com/350x220/DFDFDF?text=No+Image",
-      };
-
-      // this.currentUser = {
-      //   ...this.CurrentUser,
-      // };
+    setUser() {
+      const { id } = this.$route.params;
+      if (id !== this.currentUser.id) {
+        this.$router.push("*");
+      }
+      this.user = this.currentUser;
     },
+  
     handleCurrentUserImg(e) {
       const { files } = e.target;
 
@@ -81,11 +79,30 @@ export default {
         this.currentUser.image = imageURL;
       }
     },
-    currentUserSubmit(e) {
-      const form = e.target; // <form></form>
-      const formData = new FormData(form);
-      for (let [name, value] of formData.entries()) {
-        console.log(name + ": " + value);
+    async currentUserSubmit(e) {
+      try {
+        this.isProcessing = true;
+        const form = e.target; // <form></form>
+        if (this.user.name === "") {
+          this.isProcessing = false;
+          Toast.fire({
+            type: "warning",
+            title: "請填寫姓名",
+          });
+          return;
+        }
+        const formData = new FormData(form);
+        await userAPI.update({
+          userId: this.user.id,
+          formData,
+        });
+        this.$router.push({ name: "USER", params: { id: this.user.id } });
+      } catch (error) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "warning",
+          title: "無法增加追蹤",
+        });
       }
     },
   },

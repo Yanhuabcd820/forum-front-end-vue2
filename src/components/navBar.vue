@@ -70,6 +70,10 @@ export default {
     // this.fetchUser();
   },
   methods: {
+    // logout() {
+    //   this.$store.commit("revokeAuthentication");
+    //   this.$router.push("/signin");
+    // },
     // fetchUser() {
     //   this.currentUser = {
     //     ...this.currentUser,
