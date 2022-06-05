@@ -2,11 +2,7 @@
   <div class="card mb-3">
     <div class="row no-gutters">
       <div class="col-md-4">
-        <img
-          src="https://i.imgur.com/1LW2zCB.jpeg"
-          width="300px"
-          height="300px"
-        />
+        <img :src="profile.image | emptyImage" width="300px" height="300px" />
       </div>
       <div class="col-md-8">
         <div class="card-body">
@@ -48,14 +44,14 @@
             <button
               type="submit"
               class="btn btn-danger"
-              @click.prevent.stop="cancleFollow"
+              @click.prevent.stop="cancleFollow(profile.id)"
               v-if="isFollowed"
             >
               取消追蹤
             </button>
             <button
               class="btn btn-primary"
-              @click.prevent.stop="addFollow"
+              @click.prevent.stop="addFollow(profile.id)"
               v-else
             >
               追蹤
@@ -67,8 +63,12 @@
   </div>
 </template>
 <script>
+import userAPI from "./../apis/user";
+import { emptyImageFilter } from "./../utils/mixins";
+import { Toast } from "./../utils/helpers";
 import { mapState } from "vuex";
 export default {
+  mixins: [emptyImageFilter],
   props: {
     initialProfile: {
       type: Object,
@@ -88,22 +88,47 @@ export default {
   computed: {
     ...mapState(["currentUser", "isAuthenticated"]),
   },
-
+  created() {
+    console.log("this.currentUser", this.currentUser);
+  },
   methods: {
-    cancleFollow() {
-      this.isFollowed = false;
+    async cancleFollow(userId) {
+      try {
+        await userAPI.deleteFollowing({ userId });
+        this.isFollowed = false;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除追蹤",
+        });
+      }
     },
-    addFollow() {
-      this.isFollowed = true;
+    async addFollow(userId) {
+      try {
+        await userAPI.addFollowing({ userId });
+
+        this.isFollowed = true;
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "無法增加追蹤",
+        });
+      }
     },
   },
-  // watch: {
-  //   profile(newValue) {
-  //     this.profile = {
-  //       ...this.initialProfile,
-  //       ...newValue,
-  //     };
-  //   },
-  // },
+  watch: {
+    initialProfile(newValue) {
+      this.profile = {
+        ...this.initialProfile,
+        ...newValue,
+      };
+    },
+    initialIsFollowed(newValue) {
+      this.isFollowed = {
+        ...this.initialIsFollowed,
+        ...newValue,
+      };
+    },
+  },
 };
 </script>

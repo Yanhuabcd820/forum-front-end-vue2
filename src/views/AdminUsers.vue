@@ -19,20 +19,12 @@
           <td>{{ user.isAdmin ? "admin" : "user" }}</td>
           <td>
             <button
+              v-if="currentUser.id !== user.id"
               type="button"
               class="btn btn-link"
-              v-if="user.isAdmin"
-              @click.stop.prevent="toggleIsAdmin(user.id)"
+              @click="toggleIsAdmin({ userId: user.id, isAdmin: user.isAdmin })"
             >
-              set as admin
-            </button>
-            <button
-              type="button"
-              class="btn btn-link"
-              v-else
-              @click.stop.prevent="toggleIsAdmin(user.id)"
-            >
-              set as user
+              {{ user.isAdmin ? "set as user" : "set as admin" }}
             </button>
           </td>
         </tr>
@@ -42,41 +34,10 @@
 </template>
 <script>
 import AdminNav from "@/components/AdminNav";
-// import { v4 as uuidv4 } from "uuid";
-const dummyUsers = {
-  users: [
-    {
-      id: 1,
-      name: "root",
-      email: "root@example.com",
-      password: "$2a$10$JoEFYiTgU1fEdO8D4txOqOgjTnI.V5JHpQUUTzzuA5YtIUgPbCuCq",
-      isAdmin: true,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-    },
-    {
-      id: 2,
-      name: "user1",
-      email: "user1@example.com",
-      password: "$2a$10$J8oi5C/yCUquP0ByJiBKOOmAxlOS5M5tpN9RyDYLLsc5SiwIttGsu",
-      isAdmin: false,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-    },
-    {
-      id: 3,
-      name: "user2",
-      email: "user2@example.com",
-      password: "$2a$10$CZLIR6hMy/9u8rcNJ17Iie59XuSmzUn9f7cLiezX6oPDWkbOdtXw2",
-      isAdmin: false,
-      image: null,
-      createdAt: "2022-04-21T15:25:58.000Z",
-      updatedAt: "2022-04-21T15:25:58.000Z",
-    },
-  ],
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
+import { mapState } from "vuex";
+
 export default {
   components: {
     AdminNav,
@@ -86,25 +47,50 @@ export default {
       users: [],
     };
   },
+  computed: {
+    ...mapState(["currentUser"]),
+  },
   methods: {
-    fetchUsers() {
-      const { users } = dummyUsers;
-      this.users = users;
+    async fetchUsers() {
+      try {
+        const { data } = await adminAPI.users.get();
+        console.log("adminusers", data);
+        this.users = data.users;
+      } catch (error) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "warning",
+          title: "無法讀取adminUser",
+        });
+      }
     },
-    // toggleIsAdmin(userId) {
-    //   const user = this.users.find((user) => user.id === userId);
-    //   user.isAdmin = !user.isAdmin;
-    // },
-    toggleIsAdmin(userId) {
-      this.users = this.users.map((user) => {
-        if (user.id === userId) {
-          return {
-            ...user,
-            isAdmin: !user.isAdmin,
-          };
+
+    async toggleIsAdmin({ userId, isAdmin }) {
+      try {
+        const { data } = await adminAPI.users.update({
+          userId,
+          isAdmin: (!isAdmin).toString(),
+        });
+        if (data.status === "error") {
+          throw new Error(data.message);
         }
-        return user;
-      });
+        console.log("toggleIsAdmin", data);
+        this.users = this.users.map((user) => {
+          if (user.id === userId) {
+            return {
+              ...user,
+              isAdmin: !user.isAdmin,
+            };
+          }
+          return user;
+        });
+      } catch (error) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "warning",
+          title: "無法讀取切換role",
+        });
+      }
     },
   },
   created() {
