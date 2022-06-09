@@ -18,7 +18,11 @@
       <div class="ml-auto d-flex align-items-center">
         <template v-if="isAuthenticated">
           <!-- is user is admin -->
-          <router-link to="/admin/restaurants" class="text-white mr-3">
+          <router-link
+            to="/admin/restaurants"
+            class="text-white mr-3"
+            v-if="currentUser.isAdmin"
+          >
             管理員後台
           </router-link>
 
@@ -29,6 +33,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-success my-2 my-sm-0"
+            @click="logout"
           >
             登出
           </button>
@@ -40,17 +45,6 @@
 <script>
 /*eslint-disable*/
 import { mapState } from "vuex";
-
-// const dummyUser = {
-//   currentUser: {
-//     id: 1,
-//     name: "YANHUA",
-//     email: "root@example.com",
-//     image: "https://i.pravatar.cc/300",
-//     isAdmin: true,
-//   },
-//   isAuthenticated: true,
-// };
 
 export default {
   // Vue 會在沒有資料時使用此預設值
@@ -70,10 +64,10 @@ export default {
     // this.fetchUser();
   },
   methods: {
-    // logout() {
-    //   this.$store.commit("revokeAuthentication");
-    //   this.$router.push("/signin");
-    // },
+    logout() {
+      this.$store.commit("revokeAuthentication");
+      this.$router.push("/signin");
+    },
     // fetchUser() {
     //   this.currentUser = {
     //     ...this.currentUser,
@@ -87,3 +81,19 @@ export default {
   },
 };
 </script>
+<style scoped>
+.navbar-toggler {
+  min-width: 70px;
+  margin-right: 0;
+}
+
+nav.bg-dark {
+  padding: 14px 16px;
+  background-color: #bd2333 !important;
+}
+
+.navbar-brand {
+  font-size: 19px;
+  padding: 0;
+}
+</style>
